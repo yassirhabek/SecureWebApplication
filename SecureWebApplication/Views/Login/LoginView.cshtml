@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+<style>
+    .console{
+        background-color: #000000;
+        color: #00FF00;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <form method="post" id="loginUnsafe" class="col-xs-6">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Unsafe Login</h4>
+                    <hr />
+                    <div id="Uerror">
+
+                    </div>
+                    <div class="form-group">
+                        <input id="Uusername" placeholder="username" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input id="Upassword" placeholder="password" class="form-control" type="password" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Log in</button>
+                    </div>
+                    <div id="Umessage">
+                
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div id="console" class="console col-xs-6">
+            <i>SELECT [UserName] FROM [dbo].[User] WHERE [Username] = '' AND [Password]= ''</i>
+        </div>
+    </div>
+</div>
+
+<form method="post" id="loginSafe">
+    <div class="row" style="padding-top: 5%;">
+        <div class="col-md-4">
+            <h4>Safe Login</h4>
+            <hr />
+            <div id="Serror">
+            </div>
+            <div class="form-group">
+                <input id="Susername" placeholder="username" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input id="Spassword" placeholder="password" class="form-control" type="password" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Log in</button>
+            </div>
+            <div id="Smessage">
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script>
+        $("#Uusername").change(() => {
+            var username = $("#Uusername").val();
+            var password = $("#Upassword").val();
+            let sqlcom = "SELECT [UserName] FROM [dbo].[User] WHERE [Username] = '"
+                + username
+                + "' AND [Password]='"
+                + password
+                + "' "
+                document.getElementById("console").innerHTML = "<i>" + sqlcom + "</i>"
+        })
+
+        $("#Upassword").change(() => {
+            var username = $("#Uusername").val();
+            var password = $("#Upassword").val();
+            let sqlcom = "SELECT [UserName] FROM [dbo].[User] WHERE [Username] = '"
+                + username
+                + "' AND [Password]='"
+                + password
+                + "' "
+            document.getElementById("console").innerHTML = "<i>" + sqlcom + "</i>"
+        })
+
+        $("#loginUnsafe").submit(function (event) {
+            event.preventDefault();
+            var username = $("#Uusername").val();
+            var password = $("#Upassword").val();
+            let sqlcom = "SELECT [UserName] FROM [dbo].[User] WHERE [Username] = '"
+                + username
+                + "' AND [Password]='"
+                + password
+                + "' "
+
+            $.ajax({
+                type: "POST",
+                url: "/Login/LoginUnsafe",
+                data: { username: username, password: password }
+            })
+                .done(function (data) {
+                    document.getElementById("Uerror").innerHTML = "";
+                    document.getElementById("Umessage").innerHTML = '<div class="alert alert-success" role = "alert"> Welcome, ' + data + ' </div>';
+                    document.getElementById("console").innerHTML = "<i>" + sqlcom + "</i> <br /> <br /> <i>" + data + "</i>"
+                })
+                .fail(function (data) {
+                    document.getElementById("Umessage").innerHTML = "";
+                    const elem = document.getElementById("Uerror");
+                    var inner = '<div class="alert alert-danger" role = "alert"> ' + data.responseText + ' </div>';
+                    elem.innerHTML = inner;
+                    if (data.responseText !== "Invalid Login."){
+                        document.getElementById("console").innerHTML = "<i>" + sqlcom + "</i> <br /> <br /> <i>" + data.responseText + "</i>"
+                    }
+                    else{
+                        document.getElementById("console").innerHTML = "<i>" + sqlcom + "</i>";
+                    }
+
+                })
+        });
+
+        $("#loginSafe").submit(function (event) {
+            event.preventDefault();
+            var username = $("#Susername").val();
+            var password = $("#Spassword").val();
+            $.ajax({
+                type: "POST",
+                url: "/Login/LoginSafe",
+                data: { username: username, password: password }
+            })
+                .done(function (data) {
+                    document.getElementById("Serror").innerHTML = "";
+                    document.getElementById("Smessage").innerHTML = '<div class="alert alert-success" role = "alert"> ' + data + ' </div>';
+                })
+                .fail(function (data) {
+                    document.getElementById("Smessage").innerHTML = "";
+                    const elem = document.getElementById("Serror");
+                    var inner = '<div class="alert alert-danger" role = "alert"> ' + data.responseText + ' </div>';
+                    elem.innerHTML = inner;
+                })
+        });
+    </script>
+}

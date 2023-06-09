@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <button id="buttonHome" onclick="postButton()">click here!</button>
+</div>
+
+@section Scripts {
+    <script>
+        function postButton() {
+            console.log("hww");
+            $.ajax({
+                type: "POST",
+                url: "/Home/CheckConnection",
+            })
+                .done(function (data) {
+                    console.log(data);
+                    alert(data);
+                })
+                .fail(function (data){
+                    console.log(data);
+                    alert(data.responseText);
+                })
+        }
+    </script>
+}
